@@ -1,2 +1,2 @@
 # mobiiliohjelmointi
-Tehtävät 1 ja 2
+Jokaisessa kansiossa on oma projekti.
