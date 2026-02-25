@@ -4,7 +4,7 @@ import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
 
 export default function App() {
-  const [location, setLocation] = useState(null);
+  const [region, setRegion] = useState(null);
   const [address, setAddress] = useState("");
   const [marker, setMarker] = useState(null);
 
@@ -13,13 +13,25 @@ export default function App() {
   useEffect(() => {
     const getLocation = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
+
       if (status !== 'granted') {
         Alert.alert('No permission to access location');
         return;
       }
 
       let loc = await Location.getCurrentPositionAsync({});
-      setLocation(loc);
+
+      setRegion({
+        latitude: loc.coords.latitude,
+        longitude: loc.coords.longitude,
+        latitudeDelta: 0.0322,
+        longitudeDelta: 0.0221,
+      });
+
+      setMarker({
+        latitude: loc.coords.latitude,
+        longitude: loc.coords.longitude,
+      });
     };
 
     getLocation();
@@ -46,31 +58,30 @@ export default function App() {
       const lat = parseFloat(data[0].lat);
       const lon = parseFloat(data[0].lon);
 
-      setLocation({
-        coords: { latitude: lat, longitude: lon }
+      setRegion({
+        latitude: lat,
+        longitude: lon,
+        latitudeDelta: 0.0322,
+        longitudeDelta: 0.0221,
       });
 
-      setMarker({ latitude: lat, longitude: lon });
+      setMarker({
+        latitude: lat,
+        longitude: lon
+      });
+
     } catch (err) {
       Alert.alert("Error", err.message);
     }
   };
 
-  if (!location) {
+  if (!region) {
     return <View style={{ flex: 1, justifyContent: 'center' }} />;
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <MapView
-        style={styles.map}
-        region={{
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: 0.0322,
-          longitudeDelta: 0.0221,
-        }}
-      >
+      <MapView style={styles.map} region={region}>
         {marker && <Marker coordinate={marker} />}
       </MapView>
 
